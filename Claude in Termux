@@ -1,0 +1,177 @@
+How to Implement Claude in Termux
+==================================
+
+There are 3 main ways to use Claude in Termux:
+  1. Python + Anthropic SDK  (recommended for scripting)
+  2. Claude Code CLI          (recommended for coding tasks)
+  3. curl                     (quick one-off API calls)
+
+You need an Anthropic API key for all methods.
+Get one at: https://console.anthropic.com
+
+
+========================================
+METHOD 1: Python + Anthropic SDK
+========================================
+
+SETUP
+-----
+pkg update && pkg upgrade
+pkg install python
+pip install anthropic
+
+BASIC CHAT SCRIPT
+-----------------
+Create a file called chat.py:
+
+    import anthropic
+
+    client = anthropic.Anthropic(api_key="your-api-key-here")
+
+    message = client.messages.create(
+        model="claude-sonnet-4-6",
+        max_tokens=1024,
+        messages=[
+            {"role": "user", "content": "Hello, Claude!"}
+        ]
+    )
+
+    print(message.content[0].text)
+
+Run it:
+    python3 chat.py
+
+INTERACTIVE CHAT LOOP
+---------------------
+Create a file called interactive.py:
+
+    import anthropic
+
+    client = anthropic.Anthropic(api_key="your-api-key-here")
+    history = []
+
+    print("Chat with Claude (type 'quit' to exit)\n")
+
+    while True:
+        user_input = input("You: ").strip()
+        if user_input.lower() == "quit":
+            break
+        if not user_input:
+            continue
+
+        history.append({"role": "user", "content": user_input})
+
+        response = client.messages.create(
+            model="claude-sonnet-4-6",
+            max_tokens=1024,
+            messages=history
+        )
+
+        reply = response.content[0].text
+        history.append({"role": "assistant", "content": reply})
+        print(f"\nClaude: {reply}\n")
+
+Run it:
+    python3 interactive.py
+
+STORE API KEY SAFELY (avoid hardcoding)
+----------------------------------------
+    echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.bashrc
+    source ~/.bashrc
+
+Then in your script use:
+    import os
+    client = anthropic.Anthropic(api_key=os.environ["ANTHROPIC_API_KEY"])
+
+
+========================================
+METHOD 2: Claude Code CLI
+========================================
+
+Claude Code is Anthropic's official CLI tool for coding tasks.
+
+SETUP
+-----
+pkg update && pkg upgrade
+pkg install nodejs
+npm install -g @anthropic-ai/claude-code
+
+SET API KEY
+-----------
+    export ANTHROPIC_API_KEY="your-api-key-here"
+
+Or add it permanently:
+    echo 'export ANTHROPIC_API_KEY="your-api-key-here"' >> ~/.bashrc
+    source ~/.bashrc
+
+RUN
+---
+    claude
+
+This opens an interactive session where Claude can read,
+write, and edit files in your current directory.
+
+USEFUL COMMANDS INSIDE CLAUDE CODE
+------------------------------------
+/help       - Show help
+/clear      - Clear conversation
+/exit       - Exit session
+/compact    - Compact conversation history
+
+
+========================================
+METHOD 3: curl (Direct API Call)
+========================================
+
+SETUP
+-----
+pkg install curl
+
+ONE-OFF API CALL
+-----------------
+    curl https://api.anthropic.com/v1/messages \
+      -H "x-api-key: $ANTHROPIC_API_KEY" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "content-type: application/json" \
+      -d '{
+        "model": "claude-sonnet-4-6",
+        "max_tokens": 1024,
+        "messages": [
+          {"role": "user", "content": "Hello, Claude!"}
+        ]
+      }'
+
+PARSE RESPONSE WITH jq
+-----------------------
+    pkg install jq
+
+    curl https://api.anthropic.com/v1/messages \
+      -H "x-api-key: $ANTHROPIC_API_KEY" \
+      -H "anthropic-version: 2023-06-01" \
+      -H "content-type: application/json" \
+      -d '{
+        "model": "claude-sonnet-4-6",
+        "max_tokens": 1024,
+        "messages": [{"role": "user", "content": "Say hello"}]
+      }' | jq '.content[0].text'
+
+
+========================================
+TIPS
+========================================
+
+- Keep your API key secret — never share or commit it to git
+- Monitor usage at https://console.anthropic.com/usage
+- claude-sonnet-4-6 is the latest Sonnet model (fast + capable)
+- claude-opus-4-7 is the most powerful model (slower + costs more)
+- claude-haiku-4-5-20251001 is the fastest and cheapest model
+- Use streaming for long responses to avoid timeouts:
+    client.messages.stream(...)  # Python SDK supports this
+
+TROUBLESHOOTING
+---------------
+Error: pip not found        -> pkg install python (includes pip)
+Error: npm not found        -> pkg install nodejs
+Error: 401 Unauthorized     -> Check your API key is correct
+Error: 429 Too Many Requests -> You hit rate limits, wait and retry
+SSL errors                  -> pkg install ca-certificates
