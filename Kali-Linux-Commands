@@ -1,0 +1,157 @@
+# Kali Linux Commands Reference
+
+## System Information
+whoami                     # Show current user
+hostname                   # Show system hostname
+uname -a                   # Show kernel and system info
+id                         # Show user/group IDs
+uptime                     # Show system uptime
+
+## File & Directory
+ls -la                     # List files with permissions
+pwd                        # Print working directory
+cd /path/to/dir            # Change directory
+mkdir dirname              # Create directory
+rm -rf dirname             # Remove directory recursively
+cp source dest             # Copy file
+mv source dest             # Move/rename file
+find / -name filename      # Find file by name
+locate filename            # Locate file (uses database)
+cat file.txt               # Display file contents
+less file.txt              # Page through file
+head -n 20 file.txt        # Show first 20 lines
+tail -n 20 file.txt        # Show last 20 lines
+
+## Networking
+ifconfig                   # Show network interfaces
+ip a                       # Show IP addresses
+ip r                       # Show routing table
+netstat -tulnp             # Show open ports and services
+ss -tulnp                  # Socket statistics
+ping -c 4 host             # Ping a host 4 times
+traceroute host            # Trace route to host
+nmap -sV host              # Scan ports and service versions
+nmap -A host               # Aggressive scan (OS, scripts)
+nmap -p 1-65535 host       # Scan all ports
+wget URL                   # Download file from URL
+curl -I URL                # Fetch HTTP headers
+
+## User Management
+adduser username           # Add a new user
+passwd username            # Change user password
+usermod -aG sudo username  # Add user to sudo group
+deluser username           # Delete a user
+su username                # Switch to another user
+sudo command               # Run command as root
+
+## Package Management
+apt update                 # Update package list
+apt upgrade                # Upgrade all packages
+apt install package        # Install a package
+apt remove package         # Remove a package
+apt search keyword         # Search for a package
+dpkg -i package.deb        # Install .deb file
+
+## Process Management
+ps aux                     # List all running processes
+top                        # Interactive process viewer
+htop                       # Enhanced process viewer
+kill PID                   # Kill process by PID
+kill -9 PID                # Force kill process
+pkill processname          # Kill by process name
+bg                         # Resume job in background
+fg                         # Bring job to foreground
+jobs                       # List background jobs
+
+## File Permissions
+chmod 755 file             # Set rwxr-xr-x permissions
+chmod +x file              # Make file executable
+chown user:group file      # Change file owner
+umask 022                  # Set default permissions mask
+
+## Compression & Archives
+tar -czvf archive.tar.gz dir   # Create gzip archive
+tar -xzvf archive.tar.gz       # Extract gzip archive
+zip -r archive.zip dir         # Create zip archive
+unzip archive.zip              # Extract zip archive
+gzip file                      # Compress file
+gunzip file.gz                 # Decompress file
+
+## Text Processing
+grep -r "pattern" /path    # Recursive search for pattern
+grep -i "pattern" file     # Case-insensitive search
+awk '{print $1}' file      # Print first column
+sed 's/old/new/g' file     # Replace text in file
+sort file                  # Sort file contents
+uniq file                  # Remove duplicate lines
+wc -l file                 # Count lines in file
+cut -d: -f1 file           # Cut field from delimited file
+
+## SSH & Remote Access
+ssh user@host              # SSH into remote host
+ssh -p 2222 user@host      # SSH on custom port
+scp file user@host:/path   # Copy file to remote host
+ssh-keygen -t rsa          # Generate RSA SSH key pair
+ssh-copy-id user@host      # Copy public key to remote
+
+## Disk & Storage
+df -h                      # Show disk usage (human readable)
+du -sh /path               # Show directory size
+fdisk -l                   # List disk partitions
+mount /dev/sdb1 /mnt       # Mount a device
+umount /mnt                # Unmount a device
+lsblk                      # List block devices
+
+## Penetration Testing Tools
+# Information Gathering
+nmap -sC -sV -oN output host      # Default scripts + versions
+whois domain                       # WHOIS lookup
+dig domain                         # DNS lookup
+host domain                        # DNS lookup (simple)
+enum4linux -a host                 # SMB enumeration
+
+# Vulnerability Scanning
+nikto -h URL                       # Web server vulnerability scan
+wpscan --url URL                   # WordPress vulnerability scan
+
+# Password Attacks
+hydra -l user -P wordlist ssh://host      # SSH brute force
+hydra -l user -P wordlist ftp://host      # FTP brute force
+john --wordlist=wordlist hash.txt         # Crack password hash
+hashcat -a 0 -m 0 hash.txt wordlist      # GPU hash cracking
+
+# Wireless
+airmon-ng start wlan0              # Enable monitor mode
+airodump-ng wlan0mon               # Capture wireless traffic
+aireplay-ng -0 10 -a BSSID wlan0mon  # Deauth attack
+
+# Web Application
+sqlmap -u "URL?id=1" --dbs         # SQL injection test
+burpsuite                          # Web proxy (launch GUI)
+dirb URL /usr/share/wordlists/dirb/common.txt  # Directory brute force
+
+# Exploitation
+msfconsole                         # Launch Metasploit
+searchsploit keyword               # Search Exploit-DB
+
+## Log Files
+cat /var/log/syslog                # System log
+cat /var/log/auth.log              # Authentication log
+cat /var/log/apache2/access.log    # Apache access log
+journalctl -xe                     # Systemd journal (verbose)
+
+## Environment Variables
+env                                # Show all env variables
+export VAR=value                   # Set environment variable
+echo $PATH                         # Print PATH variable
+
+## Miscellaneous
+history                            # Show command history
+alias ll='ls -la'                  # Create command alias
+clear                              # Clear terminal screen
+man command                        # Show manual for command
+which command                      # Show command path
+echo "text"                        # Print text to stdout
+date                               # Show current date/time
+reboot                             # Reboot the system
+shutdown -h now                    # Shutdown immediately
