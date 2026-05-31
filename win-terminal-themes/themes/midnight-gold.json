@@ -1,0 +1,23 @@
+{
+    "name": "Midnight Gold",
+    "background": "#0A0E27",
+    "foreground": "#E8D5A3",
+    "cursorColor": "#FFD700",
+    "selectionBackground": "#1A2050",
+    "black": "#0A0E27",
+    "red": "#CC3333",
+    "green": "#4DAA57",
+    "yellow": "#FFD700",
+    "blue": "#3A6EA5",
+    "purple": "#9B59B6",
+    "cyan": "#16A085",
+    "white": "#E8D5A3",
+    "brightBlack": "#2C3366",
+    "brightRed": "#E74C3C",
+    "brightGreen": "#58D68D",
+    "brightYellow": "#FFE44D",
+    "brightBlue": "#5DADE2",
+    "brightPurple": "#BB8FCE",
+    "brightCyan": "#1ABC9C",
+    "brightWhite": "#FFF8DC"
+}

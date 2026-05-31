@@ -1,0 +1,21 @@
+{
+    "name": "Admin CMD",
+    "guid": "{0caa0dad-35be-5f56-a8ff-afceeeaa6101}",
+    "commandline": "cmd.exe",
+    "colorScheme": "Volcanic",
+    "font": {
+        "face": "Cascadia Mono",
+        "size": 12
+    },
+    "startingDirectory": "%USERPROFILE%",
+    "tabColor": "#CC3333",
+    "tabTitle": "Admin CMD",
+    "icon": "ms-appx:///ProfileIcons/{0caa0dad-35be-5f56-a8ff-afceeeaa6101}.scale-100.png",
+    "opacity": 95,
+    "useAcrylic": false,
+    "cursorShape": "filledBox",
+    "historySize": 9001,
+    "padding": "8, 8, 8, 8",
+    "elevate": true,
+    "bellStyle": "none"
+}

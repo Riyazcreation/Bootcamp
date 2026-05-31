@@ -1,0 +1,23 @@
+{
+    "name": "Matrix Rain",
+    "background": "#000000",
+    "foreground": "#00FF41",
+    "cursorColor": "#00FF41",
+    "selectionBackground": "#003B00",
+    "black": "#000000",
+    "red": "#006400",
+    "green": "#00FF41",
+    "yellow": "#00CC33",
+    "blue": "#005500",
+    "purple": "#00AA2A",
+    "cyan": "#00FF88",
+    "white": "#00FF41",
+    "brightBlack": "#003300",
+    "brightRed": "#008800",
+    "brightGreen": "#39FF66",
+    "brightYellow": "#00FF55",
+    "brightBlue": "#007700",
+    "brightPurple": "#00CC44",
+    "brightCyan": "#80FFB0",
+    "brightWhite": "#CCFFCC"
+}

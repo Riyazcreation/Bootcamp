@@ -1,0 +1,23 @@
+{
+    "name": "Forest Dawn",
+    "background": "#1A2010",
+    "foreground": "#D4C9A8",
+    "cursorColor": "#F4A225",
+    "selectionBackground": "#2E4020",
+    "black": "#1A2010",
+    "red": "#C0392B",
+    "green": "#4CAF50",
+    "yellow": "#F4A225",
+    "blue": "#2E86AB",
+    "purple": "#8E6DBF",
+    "cyan": "#00897B",
+    "white": "#D4C9A8",
+    "brightBlack": "#3D5030",
+    "brightRed": "#E74C3C",
+    "brightGreen": "#66BB6A",
+    "brightYellow": "#FFB74D",
+    "brightBlue": "#42A5F5",
+    "brightPurple": "#AB8FDE",
+    "brightCyan": "#26A69A",
+    "brightWhite": "#EDE8D5"
+}

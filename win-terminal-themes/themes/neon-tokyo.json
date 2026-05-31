@@ -1,0 +1,23 @@
+{
+    "name": "Neon Tokyo",
+    "background": "#0D0D1A",
+    "foreground": "#E0E0FF",
+    "cursorColor": "#FF2D78",
+    "selectionBackground": "#2D1B69",
+    "black": "#1A1A2E",
+    "red": "#FF2D78",
+    "green": "#00F5A0",
+    "yellow": "#FFD700",
+    "blue": "#00BFFF",
+    "purple": "#BF5FFF",
+    "cyan": "#00FFFF",
+    "white": "#E0E0FF",
+    "brightBlack": "#3D3D6B",
+    "brightRed": "#FF6CA0",
+    "brightGreen": "#39FF88",
+    "brightYellow": "#FFE84D",
+    "brightBlue": "#40D9FF",
+    "brightPurple": "#D580FF",
+    "brightCyan": "#80FFFF",
+    "brightWhite": "#FFFFFF"
+}
