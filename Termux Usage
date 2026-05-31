@@ -1,0 +1,76 @@
+Termux Usage Guide
+==================
+
+Termux is a terminal emulator and Linux environment for Android.
+
+INSTALLATION
+------------
+Download Termux from F-Droid (recommended) or Google Play Store.
+
+BASIC COMMANDS
+--------------
+pkg update            - Update package list
+pkg upgrade           - Upgrade installed packages
+pkg install <name>    - Install a package
+pkg uninstall <name>  - Remove a package
+pkg list-installed    - List installed packages
+pkg search <name>     - Search for packages
+
+COMMON PACKAGES
+---------------
+pkg install python    - Install Python
+pkg install nodejs    - Install Node.js
+pkg install git       - Install Git
+pkg install vim       - Install Vim editor
+pkg install curl      - Install curl
+pkg install wget      - Install wget
+pkg install openssh   - Install SSH client/server
+pkg install nano      - Install nano editor
+
+FILE SYSTEM
+-----------
+~                     - Home directory (/data/data/com.termux/files/home)
+/sdcard               - Internal storage access
+termux-setup-storage  - Grant storage permissions
+
+STORAGE ACCESS
+--------------
+Run: termux-setup-storage
+Then access phone storage at: ~/storage/
+
+GIT USAGE
+---------
+git clone <url>       - Clone a repository
+git add .             - Stage all changes
+git commit -m "msg"   - Commit changes
+git push              - Push to remote
+git pull              - Pull from remote
+
+PYTHON USAGE
+------------
+python3 --version     - Check Python version
+pip install <pkg>     - Install Python package
+python3 script.py     - Run a Python script
+
+SSH
+---
+ssh-keygen -t ed25519 - Generate SSH key
+cat ~/.ssh/id_ed25519.pub  - View public key (add to GitHub)
+ssh user@host         - Connect to remote server
+
+USEFUL TIPS
+-----------
+- Use Ctrl+L to clear the screen
+- Use Tab for auto-completion
+- Long press on screen to copy/paste
+- Swipe from left edge to open extra keys bar
+- Use 'termux-open <file>' to open files with Android apps
+- Multiple sessions: swipe from left or use Volume Down + Q
+
+KEYBOARD SHORTCUTS
+------------------
+Ctrl+C  - Cancel current command
+Ctrl+D  - Exit session
+Ctrl+Z  - Suspend process
+Ctrl+A  - Move to start of line
+Ctrl+E  - Move to end of line

@@ -1,0 +1,287 @@
+Git in Termux - Installation and Usage Guide
+=============================================
+
+
+========================================
+INSTALLATION
+========================================
+
+Step 1: Update packages
+-----------------------
+    pkg update && pkg upgrade
+
+Step 2: Install Git
+-------------------
+    pkg install git
+
+Step 3: Verify installation
+----------------------------
+    git --version
+
+
+========================================
+FIRST TIME SETUP
+========================================
+
+Set your name and email (required before committing):
+
+    git config --global user.name "Your Name"
+    git config --global user.email "you@example.com"
+
+Set default branch name to main:
+
+    git config --global init.defaultBranch main
+
+Check your config:
+
+    git config --list
+
+
+========================================
+SSH KEY SETUP (for GitHub/GitLab)
+========================================
+
+Step 1: Install openssh
+-----------------------
+    pkg install openssh
+
+Step 2: Generate SSH key
+------------------------
+    ssh-keygen -t ed25519 -C "you@example.com"
+    (Press Enter to accept defaults)
+
+Step 3: View your public key
+-----------------------------
+    cat ~/.ssh/id_ed25519.pub
+
+Step 4: Add key to GitHub
+--------------------------
+    1. Copy the output of the above command
+    2. Go to GitHub -> Settings -> SSH and GPG keys
+    3. Click "New SSH key"
+    4. Paste your key and save
+
+Step 5: Test connection
+------------------------
+    ssh -T git@github.com
+
+
+========================================
+BASIC GIT WORKFLOW
+========================================
+
+CREATE A NEW REPOSITORY
+------------------------
+    mkdir myproject
+    cd myproject
+    git init
+
+CLONE AN EXISTING REPOSITORY
+------------------------------
+    git clone https://github.com/username/repo.git
+
+    # or using SSH (after setting up SSH key):
+    git clone git@github.com:username/repo.git
+
+CHECK STATUS
+------------
+    git status
+
+ADD FILES (stage changes)
+--------------------------
+    git add filename.txt        # add a specific file
+    git add .                   # add all changed files
+    git add *.py                # add all .py files
+
+COMMIT CHANGES
+--------------
+    git commit -m "Your commit message here"
+
+VIEW COMMIT HISTORY
+--------------------
+    git log                     # full log
+    git log --oneline           # compact log
+    git log --oneline -10       # last 10 commits
+
+PUSH TO REMOTE
+--------------
+    git push                    # push current branch
+    git push origin main        # push main branch
+    git push -u origin main     # push and set upstream
+
+PULL FROM REMOTE
+-----------------
+    git pull                    # pull current branch
+    git pull origin main        # pull from main
+
+
+========================================
+BRANCHING
+========================================
+
+LIST BRANCHES
+--------------
+    git branch                  # local branches
+    git branch -a               # all branches (including remote)
+
+CREATE A BRANCH
+----------------
+    git branch new-feature
+
+SWITCH TO A BRANCH
+-------------------
+    git checkout new-feature
+    # or newer syntax:
+    git switch new-feature
+
+CREATE AND SWITCH IN ONE STEP
+------------------------------
+    git checkout -b new-feature
+    # or newer syntax:
+    git switch -c new-feature
+
+MERGE A BRANCH
+---------------
+    git checkout main
+    git merge new-feature
+
+DELETE A BRANCH
+----------------
+    git branch -d new-feature          # safe delete
+    git branch -D new-feature          # force delete
+    git push origin --delete new-feature  # delete remote branch
+
+
+========================================
+UNDOING CHANGES
+========================================
+
+DISCARD UNSTAGED CHANGES
+-------------------------
+    git restore filename.txt    # restore a file
+    git restore .               # restore all files
+
+UNSTAGE A FILE
+---------------
+    git restore --staged filename.txt
+
+UNDO LAST COMMIT (keep changes)
+---------------------------------
+    git reset --soft HEAD~1
+
+UNDO LAST COMMIT (discard changes)
+------------------------------------
+    git reset --hard HEAD~1
+
+REVERT A COMMIT (safe, creates new commit)
+-------------------------------------------
+    git revert <commit-hash>
+
+
+========================================
+VIEWING DIFFERENCES
+========================================
+
+    git diff                    # unstaged changes
+    git diff --staged           # staged changes
+    git diff main..feature      # between branches
+    git show <commit-hash>      # changes in a commit
+
+
+========================================
+WORKING WITH REMOTE REPOSITORIES
+========================================
+
+VIEW REMOTES
+-------------
+    git remote -v
+
+ADD A REMOTE
+-------------
+    git remote add origin https://github.com/user/repo.git
+
+CHANGE REMOTE URL
+------------------
+    git remote set-url origin git@github.com:user/repo.git
+
+FETCH CHANGES (without merging)
+---------------------------------
+    git fetch origin
+
+UPDATE LOCAL BRANCH LIST
+--------------------------
+    git fetch --prune
+
+
+========================================
+.GITIGNORE
+========================================
+
+Create a .gitignore file to exclude files from tracking:
+
+    nano .gitignore
+
+Common entries:
+    __pycache__/
+    *.pyc
+    .env
+    node_modules/
+    *.log
+    .DS_Store
+
+After creating .gitignore:
+    git add .gitignore
+    git commit -m "Add .gitignore"
+
+
+========================================
+USEFUL SHORTCUTS & TIPS
+========================================
+
+    git status -s               # short status output
+    git log --oneline --graph   # visual branch graph
+    git stash                   # temporarily save changes
+    git stash pop               # restore stashed changes
+    git cherry-pick <hash>      # apply a specific commit
+    git blame filename.txt      # see who changed each line
+    git grep "search term"      # search inside tracked files
+
+ALIASES (optional shortcuts)
+------------------------------
+    git config --global alias.st status
+    git config --global alias.co checkout
+    git config --global alias.br branch
+    git config --global alias.lg "log --oneline --graph"
+
+    # Usage:
+    git st      # same as git status
+    git co main # same as git checkout main
+    git lg      # pretty log graph
+
+
+========================================
+COMMON ERRORS & FIXES
+========================================
+
+"Please tell me who you are"
+    -> git config --global user.name "Name"
+    -> git config --global user.email "email"
+
+"Permission denied (publickey)"
+    -> Set up SSH key (see SSH KEY SETUP section above)
+
+"fatal: not a git repository"
+    -> Run 'git init' or 'cd' into your repo folder
+
+"rejected - non-fast-forward"
+    -> git pull origin main --rebase
+    -> Then push again
+
+"merge conflict"
+    -> Open the conflicted file, fix the <<<<< ===== >>>>> markers
+    -> git add .
+    -> git commit
+
+Authentication failed (HTTPS)
+    -> Use SSH instead, or use a Personal Access Token
+    -> GitHub no longer accepts passwords for HTTPS
