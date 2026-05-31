@@ -1,0 +1,21 @@
+{
+    "name": "WSL Ubuntu",
+    "guid": "{2c4de342-38b7-51cf-b940-2309a097f518}",
+    "source": "Windows.Terminal.Wsl",
+    "colorScheme": "Neon Tokyo",
+    "font": {
+        "face": "JetBrains Mono NL",
+        "size": 12,
+        "weight": "normal"
+    },
+    "startingDirectory": "//wsl$/Ubuntu/home/%USERNAME%",
+    "tabColor": "#00FFFF",
+    "opacity": 90,
+    "useAcrylic": true,
+    "acrylicOpacity": 0.90,
+    "cursorShape": "underscore",
+    "historySize": 9001,
+    "padding": "8, 8, 8, 8",
+    "scrollbarState": "hidden",
+    "commandline": "wsl.exe ~ -d Ubuntu -- zsh -c 'eval \"$(starship init zsh)\"; exec zsh'"
+}

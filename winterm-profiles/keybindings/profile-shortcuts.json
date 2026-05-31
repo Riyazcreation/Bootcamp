@@ -1,0 +1,28 @@
+{
+    "_comment": "Add these entries to the 'actions' array in your Windows Terminal settings.json",
+    "actions": [
+        { "command": { "action": "newTab", "profile": "Dev PowerShell" },     "keys": "ctrl+shift+1" },
+        { "command": { "action": "newTab", "profile": "WSL Ubuntu" },          "keys": "ctrl+shift+2" },
+        { "command": { "action": "newTab", "profile": "Admin CMD" },           "keys": "ctrl+shift+3" },
+        { "command": { "action": "newTab", "profile": "Python Dev" },          "keys": "ctrl+shift+4" },
+
+        { "command": { "action": "splitPane", "split": "vertical",   "profile": "Dev PowerShell" }, "keys": "ctrl+alt+h" },
+        { "command": { "action": "splitPane", "split": "horizontal", "profile": "Dev PowerShell" }, "keys": "ctrl+alt+v" },
+
+        { "command": "moveFocusPaneLeft",  "keys": "alt+left"  },
+        { "command": "moveFocusPaneRight", "keys": "alt+right" },
+        { "command": "moveFocusPaneUp",    "keys": "alt+up"    },
+        { "command": "moveFocusPaneDown",  "keys": "alt+down"  },
+
+        { "command": { "action": "resizePane", "direction": "left"  }, "keys": "alt+shift+left"  },
+        { "command": { "action": "resizePane", "direction": "right" }, "keys": "alt+shift+right" },
+        { "command": { "action": "resizePane", "direction": "up"    }, "keys": "alt+shift+up"    },
+        { "command": { "action": "resizePane", "direction": "down"  }, "keys": "alt+shift+down"  },
+
+        { "command": { "action": "scrollUp",   "rowsToScroll": 5 }, "keys": "ctrl+up"   },
+        { "command": { "action": "scrollDown", "rowsToScroll": 5 }, "keys": "ctrl+down" },
+
+        { "command": "toggleFullscreen", "keys": "f11" },
+        { "command": "toggleFocusMode",  "keys": "ctrl+shift+f" }
+    ]
+}
